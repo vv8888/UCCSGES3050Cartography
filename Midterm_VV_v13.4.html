@@ -1,0 +1,210 @@
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>Midterm Earthquakes</title>
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.js"></script>
+
+
+<link href = 'Midterm_VV_styles.css' rel = 'stylesheet' />
+
+</head>
+
+<body>
+<div id="map"></div>
+
+
+<div class='map-overlay'> 
+    <div class='map-overlay-inner'>
+        <h2> Earthquakes From 1800 to 2025</h2>
+            <div id="slider-container" style="width: 400px; margin: 10px auto;">
+              <div id="year-range-slider"></div>
+              <div style="text-align: center;">
+                <span>Start Year: <span id="slider-start">1800</span></span> &nbsp;&nbsp;
+                <span>End Year: <span id="slider-end">2025</span></span>
+              </div>
+            </div>
+
+        <p class="credit"> This map is created for <a href="https://github.com/vv8888/GES_MidTerm_EQmap.git"> GES Cartography SPR2025 Midterm </a> by using the <a href="https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-data?maxYear=2025&minYear=1800"> NOAA-National Centers For Environmental Information Historical Earthquake Data</a> and <a href='https://www.globalquakemodel.org/product/active-faults-database'>The GEM Foundation's Global Active Faults Dataset</a>  </p>
+        
+    </div>
+</div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoidmF2ZWRyYWwiLCJhIjoiY203dzRodGJvMDFwdDJ0cHR3OWVidTNzZyJ9.ctvWpYhVUmTHOVgJBI2nRg';  //Put your mapbox access token here
+
+        // Load a new map in the 'map' HTML div
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/vavedral/cm8dno1k100rw01sobslx55bu', // Put your mapbox style ID here
+            center: [121.4944,38.5781], // starting position [lng, lat]
+            zoom: 3 // starting zoom
+        });
+
+               
+        map.on('load', () => {
+
+            // Add a CIRCLE layer to the map 
+            map.addLayer({
+                'id':'eq_mag',
+                'type':'circle',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://vavedral.9rra8cdt' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'earthquakes-2025-03-17_13-21--bk8flv', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'circle-color':{
+                       property:'DeathDescription',         
+                       stops:[
+                            [{zoom:3, value:0}, '#FFFFFF'],
+                            [{zoom:3, value:1}, '#FFCC00'],
+                            [{zoom:3, value:2}, '#FF9933'],
+                            [{zoom:3, value:3}, '#FF6600'],
+                            [{zoom:3, value:4}, '#FF0000'],
+                            [{zoom:9, value:0}, '#FFFFFF'],
+                            [{zoom:9, value:1}, '#FFCC00'],
+                            [{zoom:9, value:2}, '#FF9933'],
+                            [{zoom:9, value:3}, '#FF6600'],
+                            [{zoom:9, value:4}, '#FF0000'],
+                            [{zoom:16, value:0}, '#FFFFFF'],
+                            [{zoom:16, value:1}, '#FFCC00'],
+                            [{zoom:16, value:2}, '#FF9933'],
+                            [{zoom:16, value:3}, '#FF6600'],
+                            [{zoom:16, value:4}, '#FF0000'],
+                        ]                                 //setting up proportional circle colors based on death descriptions
+                    },
+                    'circle-opacity':0.2,
+                    'circle-stroke-width':{
+                        stops: [[8,0.5], [100,5], [500,10]]
+                    },
+                    'circle-stroke-color':'white',          //points on the graph
+                    'circle-stroke-opacity':0.5,
+                    'circle-radius': {
+                       property:'Mag',         
+                       stops:[
+                            [{zoom:3, value:3.0}, 2],
+                            [{zoom:3, value:6.5}, 10],
+                            [{zoom:3, value:9.5}, 20],
+                            [{zoom:9, value:3.0}, 4],
+                            [{zoom:9, value:6.5}, 20],
+                            [{zoom:9, value:9.5}, 40],
+                            [{zoom:16, value:3.0}, 8],
+                            [{zoom:16, value:6.5}, 40],
+                            [{zoom:16, value:9.5}, 80],
+                        ]                                 //setting up proportional circle
+                    }
+                }
+            });    
+
+                    // Add a LABEL layer to the map 
+                map.addLayer({
+                    'id':'eq_mag_label',
+                    'type':'symbol',
+                    'source':'eq_mag',
+                    'source-layer':'earthquakes-2025-03-17_13-21--bk8flv',  // name of tilesets
+                    'layout':{
+                        'text-field':'{Mag}',
+                        'text-size':{
+                            stops:[[0, 8],[100, 25],[500,150]]    
+                        }
+                    },
+                    'paint':{
+                        'text-color':'white'
+                    }
+
+                })
+
+                  // Create the slider
+                  const slider = document.getElementById('year-range-slider');
+
+                  noUiSlider.create(slider, {
+                    start: [1800, 2025],
+                    connect: true,
+                    step: 1,
+                    range: {
+                      'min': 1800,
+                      'max': 2025
+                    },
+                    tooltips: [true, true],
+                    format: {
+                      to: value => Math.round(value),
+                      from: value => Number(value)
+                    }
+                  });
+
+                    const startSpan = document.getElementById('slider-start');
+                    const endSpan = document.getElementById('slider-end');
+                  
+                    // Update filter on slide
+                    slider.noUiSlider.on('update', function (values) {
+                        const startYear = parseInt(values[0]);
+                        const endYear = parseInt(values[1]);
+                       
+                        startSpan.textContent = startYear;
+                        endSpan.textContent = endYear;
+
+
+                        // Shared filter for both layers
+                        const yearFilter = [
+                            'all',
+                            ['>=', ['get', 'Year'], startYear],
+                            ['<=', ['get', 'Year'], endYear]
+                          ];
+
+                        if (map.getLayer('eq_mag')) {
+                            map.setFilter('eq_mag', yearFilter);
+                        }
+
+                        if (map.getLayer('eq_mag_label')) {
+                            map.setFilter('eq_mag_label', yearFilter);
+                        }
+                      });
+
+
+
+            // To display a popup 
+            var mypopup = new mapboxgl.Popup({offset:[1,1],closeButton: false})
+
+            // Another event listener that adds the popup when the user puts their cursor over the tube circles
+            map.on('mouseover', 'eq_mag', function(e){
+                mypopup
+                    .setLngLat(e.features[0].geometry.coordinates)
+                    .setHTML( "<h3>EQ Quick Stats</h3>" + 
+                                "Year: " + e.features[0].properties.Year + "<br>" +
+                                "Mag: " + e.features[0].properties.Mag + "<br>" +
+                                "Injuries: " + e.features[0].properties.Injuries + "<br>" +
+                                "Deaths: " + e.features[0].properties.Deaths + "<br>" +
+                                "Damage ($Mil): " + e.features[0].properties.Damage_Mil + "<br>" +
+                                "Total Missing: " + e.features[0].properties.TotalMissing)
+                    .addTo(map);
+            });
+
+
+            // Change the cursor to a pointer when the mouse is over the stations layer.
+            map.on('mouseenter', 'eq_mag', function () {
+                  map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves and remove the popup window.
+            map.on('mouseleave', 'eq_mag', function () {
+                map.getCanvas().style.cursor = '';
+                mypopup.remove();
+            });                     
+
+
+        });
+
+</script>
+
+</body>
+</html>
