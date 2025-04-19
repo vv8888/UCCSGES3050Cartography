@@ -1,0 +1,211 @@
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>Final Project Wild Fires and Landslides</title>
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.js"></script>
+
+
+<link href = 'FinalProject_styles_css.css' rel = 'stylesheet' />
+
+</head>
+
+<body>
+<div id="map"></div>
+
+
+<div class='map-overlay'> 
+    <div class='map-overlay-inner'>
+        <h2> USA Wild Fires and Landslides From 2000 to 2010</h2>
+            <div id="slider-container" style="width: 400px; margin: 10px auto;">
+              <div id="year-range-slider"></div>
+              <div style="text-align: center;">
+                <span>Start Year: <span id="slider-start">2000</span></span> &nbsp;&nbsp;
+                <span>End Year: <span id="slider-end">2010</span></span>
+              </div>
+            </div>
+
+        <p class="credit"> This map is created for <a href="https://github.com/vv8888/GES_MidTerm_EQmap.git"> GES Cartography SPR2025 Final Project </a> by using the <a href="https://data-nifc.opendata.arcgis.com/search?tags=historic_wildlandfire_opendata%2CCategory"> National Interagency Fire Cener</a> and <a href="https://www.sciencebase.gov/catalog/item/671eef1fd34ed0f827ea9f12">Landslide Inventories across the United States (ver. 3.0, February 2025): U.S. Geological Survey Dataset</a>  </p>
+        
+    </div>
+</div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoidmF2ZWRyYWwiLCJhIjoiY203dzRodGJvMDFwdDJ0cHR3OWVidTNzZyJ9.ctvWpYhVUmTHOVgJBI2nRg';  //Put your mapbox access token here
+
+        // Load a new map in the 'map' HTML div
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/vavedral/cm9nfln0100b501rm69211oz6', // Put your mapbox style ID here
+            center: [-104.821,38.834], // starting position [lng, lat]
+            zoom: 11 // starting zoom
+        });
+
+               
+        map.on('load', () => {
+
+            // Add a Wild Fire layer to the map 
+            map.addLayer({
+                'id':'WF_polygon',
+                'type':'fill',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://vavedral.b4xgwv5h' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'Historic_Geomac_Perimeters_Co-ciwjki', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'fill-color': '#ff69b4',         // Hot pink
+                    'fill-opacity': 0.5,             // Semi-transparent
+                    'fill-outline-color': '#ff69b4'  // Optional border
+                }
+            });
+
+            // Add a Landslides layer to the map 
+            map.addLayer({
+                'id':'LS_point',
+                'type':'circle',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://vavedral.97n7p7ut' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'us_ls_v3_point-7gysfr', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'circle-color': '#f2a32c',         // Orange
+                    'circle-opacity': 0.9999,             // not-transparent
+                    'circle-outline-color': '#a6303e'  // Optional border
+                }
+            });
+
+            // Add a Volcano layer to the map 
+            map.addLayer({
+                'id':'vol_point',
+                'type':'circle',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://vavedral.22c844zd' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'Smithsonian_Volcano_list-1voya6', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'circle-color': '#2feea2',         // Orange
+                    'circle-opacity': 0.9999,             // not-transparent
+                    'circle-outline-color': '#0c3b28'  // Optional border
+                }
+            });
+
+                //     // Add a LABEL layer to the map 
+                // map.addLayer({
+                //     'id':'WF_name_label',
+                //     'type':'symbol',
+                //     'source':'WF_ploygon',
+                //     'source-layer':'Historic_Geomac_Perimeters_Co-ciwjki',  // name of tilesets
+                //     'layout':{
+                //         'text-field':'{incidentna}',
+                //         'text-size':{
+                //             stops:[[0, 8],[100, 25],[500,150]]    
+                //         }
+                //     },
+                //     'paint':{
+                //         'text-color':'white'
+                //     }
+
+                // })
+
+                  // // Create the slider
+                  // const slider = document.getElementById('year-range-slider');
+
+                  // noUiSlider.create(slider, {
+                  //   start: [1800, 2025],
+                  //   connect: true,
+                  //   step: 1,
+                  //   range: {
+                  //     'min': 1800,
+                  //     'max': 2025
+                  //   },
+                  //   tooltips: [true, true],
+                  //   format: {
+                  //     to: value => Math.round(value),
+                  //     from: value => Number(value)
+                  //   }
+                  // });
+
+                  //   const startSpan = document.getElementById('slider-start');
+                  //   const endSpan = document.getElementById('slider-end');
+                  
+                  //   // Update filter on slide
+                  //   slider.noUiSlider.on('update', function (values) {
+                  //       const startYear = parseInt(values[0]);
+                  //       const endYear = parseInt(values[1]);
+                       
+                  //       startSpan.textContent = startYear;
+                  //       endSpan.textContent = endYear;
+
+
+                  //       // Shared filter for both layers
+                  //       const yearFilter = [
+                  //           'all',
+                  //           ['>=', ['get', 'Year'], startYear],
+                  //           ['<=', ['get', 'Year'], endYear]
+                  //         ];
+
+                  //       if (map.getLayer('eq_mag')) {
+                  //           map.setFilter('eq_mag', yearFilter);
+                  //       }
+
+                  //       if (map.getLayer('eq_mag_label')) {
+                  //           map.setFilter('eq_mag_label', yearFilter);
+                  //       }
+                  //     });
+
+
+
+            // To display a popup 
+            // var mypopup = new mapboxgl.Popup({offset:[1,1],closeButton: false})
+
+            // // Another event listener that adds the popup when the user puts their cursor over the tube circles
+            // map.on('mouseover', 'WF_polygon', function(e){
+            //     mypopup
+            //         .setLngLat(e.features[0].geometry.coordinates)
+            //         .setHTML( "<h3>WF Quick Stats</h3>" + 
+            //                     "Year: " + e.features[0].properties.fireyear + "<br>" +
+            //                     "Comments: " + e.features[0].properties.comments + "<br>" +
+            //                     "Fire Code: " + e.features[0].properties.firecode)
+            //         //             "Deaths: " + e.features[0].properties.Deaths + "<br>" +
+            //         //             "Damage ($Mil): " + e.features[0].properties.Damage_Mil + "<br>" +
+            //         //             "Total Missing: " + e.features[0].properties.TotalMissing)
+            //         .addTo(map);
+            // });
+
+
+            // // Change the cursor to a pointer when the mouse is over the stations layer.
+            // map.on('mouseenter', 'WF_polygon', function () {
+            //       map.getCanvas().style.cursor = 'pointer';
+            // });
+
+            // // Change it back to a pointer when it leaves and remove the popup window.
+            // map.on('mouseleave', 'WF_polygon', function () {
+            //     map.getCanvas().style.cursor = '';
+            //     mypopup.remove();
+            // });                     
+
+
+        });
+
+</script>
+
+</body>
+</html>
