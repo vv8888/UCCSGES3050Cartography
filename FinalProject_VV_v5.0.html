@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wild Fires Visualization</title>
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <!-- Google Fonts -->
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> -->
+   
+   <!-- --Final Projectstyle sheet!!!-- -->
+  <link href = 'finalstyle.css' rel = 'stylesheet' /> -->
+
+  
+
+</head>
+
+<body>
+<div id="map"></div>
+<div id="title-box">USA Wild Fires from 2000 to 2010</div>
+<div id="slider-container">
+    <label for="slider">Filter Wild Fires by Year:</label>
+    <div class="tooltip-wrapper">
+      <div id="slider-tooltip">2000</div>
+      <input id="slider" type="range" min="2000" max="2010" step="1" value="2000">
+    </div>
+  </div>
+
+<div id="legend">
+    <div class="legend-item">
+        <h3> Acres Burned</h3><br>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #f3d516;"></div>
+      <5,000
+    </div>    
+    <div class="legend-item">
+      <div class="legend-color" style="background: #f38516;"></div>
+      5,001-50,000
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ff69b4;"></div>
+      50,001-500,000
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #f31616;"></div>
+      >500,000 
+    </div>
+  </div>
+
+</div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoidmF2ZWRyYWwiLCJhIjoiY203dzRodGJvMDFwdDJ0cHR3OWVidTNzZyJ9.ctvWpYhVUmTHOVgJBI2nRg';  //Put your mapbox access token here
+
+        // Load a new map in the 'map' HTML div
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/vavedral/cm9nfln0100b501rm69211oz6', // Put your mapbox style ID here
+            center: [-104.439,36.903], // starting position [lng, lat]
+            zoom: 6, // starting zoom
+            minZoom: 6,
+            maxZoom: 11
+        });
+
+               
+        map.on('load', () => {
+            // Add a Wild Fire layer to the map 
+            map.addLayer({
+                'id': 'WF_polygon',
+                'type': 'fill',
+                'source': {
+                    type: 'vector',
+                    url: 'mapbox://vavedral.b4xgwv5h' // Your Mapbox tileset Map ID
+                },
+                'source-layer': 'Historic_Geomac_Perimeters_Co-ciwjki', // Name of the tileset
+                minZoom: 6,
+                maxZoom: 11,
+                'layout': {
+                    'visibility': 'visible'
+                },
+                // Polygon color based on acres burned
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'gisacres'], // Replace 'gisacres' with the actual property name in your data
+                        0, '#f3d516',        // Small burn (Yellow)
+                        5000, '#f38516',      // Moderate burn (Orange)
+                        50000, '#ff69b4',      // Large burn (Hot Pink)
+                        500000, '#f31616'      // Very large burn (Red)
+                    ],
+                    'fill-outline-color': '#f31616'      // Red
+                    ,
+                    'fill-opacity': 0.6 // Semi-transparent
+                }
+            });
+
+            // Add a Landslides layer to the map 
+            // map.addLayer({
+            //     'id':'LS_point',
+            //     'type':'circle',
+            //     'source':{
+            //         type:'vector',
+            //         url:'mapbox://vavedral.97n7p7ut' // Your Mapbox tileset Map ID
+            //     },
+            //     'source-layer':'us_ls_v3_point-7gysfr', // name of tilesets
+            //     'layout':{
+            //         'visibility': 'visible'
+            //     },
+            //     'paint': {
+            //         'circle-color': '#f2a32c',         // Orange
+            //         'circle-opacity': 0.9999,             // not-transparent
+            //         'circle-outline-color': '#a6303e'  // Optional border
+            //     }
+            // });
+
+            // // Add a Volcano layer to the map 
+            // map.addLayer({
+            //     'id':'vol_point',
+            //     'type':'circle',
+            //     'source':{
+            //         type:'vector',
+            //         url:'mapbox://vavedral.22c844zd' // Your Mapbox tileset Map ID
+            //     },
+            //     'source-layer':'Smithsonian_Volcano_list-1voya6', // name of tilesets
+            //     'layout':{
+            //         'visibility': 'visible'
+            //     },
+            //     'paint': {
+            //         'circle-color': '#2feea2',         // Orange
+            //         'circle-opacity': 0.9999,             // not-transparent
+            //         'circle-outline-color': '#0c3b28'  // Optional border
+            //     }
+            // });
+
+
+      // Add popups
+      map.on('click', 'WF_polygon', (e) => {
+        const properties = e.features[0].properties;
+        const popupContent = `
+          <div style="font-size: 14px; line-height: 1.5;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td><strong>Fire Name:</strong></td><td>${properties.incidentna}</td></tr>
+              <tr><td><strong>State:</strong></td><td>${properties.state}</td></tr> 
+              <tr><td><strong>Date:</strong></td><td>${properties.perimeterd}</td></tr>
+              <tr><td><strong>Acres Burned:</strong></td><td>${properties.gisacres}</td></tr>
+            </table>
+          </div>
+        `;
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(popupContent)
+          .addTo(map);
+      });
+
+      // Change cursor to pointer on hover
+      map.on('mouseenter', 'WF_polygon', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'WF_polygon', () => {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // Add slider functionality
+      const slider = document.getElementById('slider');
+      const sliderTooltip = document.getElementById('slider-tooltip');
+      slider.addEventListener('input', (event) => {
+        const year = parseInt(event.target.value); // Get the selected year from the slider
+        sliderTooltip.textContent = year; // Update the tooltip to show the current year
+        map.setFilter('WF_polygon', ['==', ['get', 'fireyear'], year]); // Filter by year
+      });
+
+    });
+
+</script>
+
+</body>
+</html>
