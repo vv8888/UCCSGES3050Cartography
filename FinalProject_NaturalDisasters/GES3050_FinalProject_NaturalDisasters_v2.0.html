@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Project: Interactive Map Showcasing 4 Natural Disaster in the USA from 2000 to 2010</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+    header { background: rgba(255, 255, 255, 0.85); color: black; padding: 1px; text-align: center;  }
+    nav { display: flex; background: #333; justify-content: center; }
+    nav a { color: white; padding: 10px 15px; text-decoration: none; }
+    nav a:hover { background-color: #575757; }
+    section { display: none; margin:0; padding: 10px; height: 100vh; overflow: hidden; }
+    section.active { display: block; }
+    iframe { width: 100%; height: 80vh; border: none; z-index: 1}
+/*    iframe { position: fixed; top: 00px; bottom: 0; width: 100%; height: 100vh; border: none; z-index: 0; }*/
+/*    .scroll-container { position: relative; z-index: 1; width: 100%; max-width: 800px; margin: auto; background: rgba(255, 255, 255, 0.85); }*/
+
+    #charts {
+      display: none; /* hidden by default like all sections */
+      margin: 0;
+      padding: 10px;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    #charts.active {
+      display: grid; /* only display as grid when active */
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Natural Disasters in the USA from 2000 to 2010</h1>
+    <p>By: Group 1 (aka "The Natural Disasters" - being destructive... naturally)</p>
+  </header>
+
+  <nav>
+    <a href="#" onclick="showTab('intro')">Intro</a>
+    <a href="#" onclick="showTab('mapTornadoes')">Tornadoes - by Chase Ingersoll</a>
+    <a href="#" onclick="showTab('mapWildfires')">Wildfires - by Vanessa Vedral</a>
+    <a href="#" onclick="showTab('mapLandslides')">Landslides - by Meghan Boniecki</a>
+    <a href="#" onclick="showTab('mapHurricanes')">Hurricanes - by Katie Dickamore</a>
+    <a href="#" onclick="showTab('charts')">Charts</a>  
+  </nav>
+
+  <section id="intro" class="active">
+    <h2>Welcome to Our Map Project</h2>
+    <p>This site showcases a collection of interactive maps developed by our team. Each map focuses on a common spatial theme around natural disasters. Click the tabs to explore each team member's contribution.</p>
+    <!-- <iframe id="map-frame" src="https://vv8888.github.io/UCCSGES3050Cartography/FinalProject_NaturalDisasters/NaturalDisater_HomePIC2.jpg"></iframe> -->
+    <img src="https://vv8888.github.io/UCCSGES3050Cartography/FinalProject_NaturalDisasters/NaturalDisater_HomePIC2.jpg">
+  </section>
+
+  <section id="mapTornadoes">
+    <h2>Map 1: Tornadoes</h2>
+    <iframe src="https://chaseingersoll.github.io/Tornadoes/tornadoes_final_css.html"></iframe>
+  </section>
+
+  <section id="mapWildfires">
+    <h2>Map 2: WildFires</h2>
+    <iframe src="https://vv8888.github.io/UCCSGES3050Cartography/FinalProject_VV_v5.0.html"></iframe>
+  </section>
+
+  <section id="mapLandslides">
+    <h2>Map 3: Landslides</h2>
+    <iframe src="https://vv8888.github.io/UCCSGES3050Cartography/Landslide_MB_v1.0.html"></iframe>
+  </section>
+
+  <section id="mapHurricanes">
+    <h2>Map 3: Hurricanes</h2>
+    <iframe src="https://katielynnd.github.io/Hurricane-Visualization/hurricane_visualization.html"></iframe>
+  </section>
+
+  <section id="charts">
+    <iframe id="chartTornadoes" src="https://chaseingersoll.github.io/Tornadoes/lab9_v2.html"></iframe>
+    <iframe id="chartWildfires" src="https://chaseingersoll.github.io/Tornadoes/wildfiresheatmap.html"></iframe>
+    <iframe id="chartLandslides" src="https://chaseingersoll.github.io/Tornadoes/landslidesheatmap.html"></iframe>
+    <iframe id="chartHurricanes" src="https://katielynnd.github.io/Hurricane-Intensity-Chart/USA_heatmap_test_3.html"></iframe>
+  </section>
+
+ 
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
