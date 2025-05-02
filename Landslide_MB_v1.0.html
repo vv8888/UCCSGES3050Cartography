@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Final Project - USA Landslides 2000 to 2010</title>
+
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+  <!--<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">-->
+<link href = 'finalstyle.css' rel = 'stylesheet' /> -->
+</head>
+
+<body>
+  <div id="map"></div>
+
+<div id="title-box">USA Landslides from 2000 to 2010</div>
+  <div id="slider-container">
+    <label for="slider">Filter Landslides by Year:</label>
+    <div class="tooltip-wrapper">
+      <div id="slider-tooltip">2000</div>
+      <input id="slider" type="range" min="2000" max="2010" step="1" value="2000">
+    </div>
+  </div>
+
+<div id="legend">
+  <!-- <h3>Legend</h3> -->
+  <div class="legend-item">
+    <div class="legend-color" style="background: #54C571;"></div>
+    Debris
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #306754;"></div>
+    Mass Failure
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #98AFC7;"></div>
+    Mudslide
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #FBD5AB;"></div>
+    Rockfall
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #E9AB17;"></div>
+    Weather Related
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #E1D9D1;"></div>
+    Data Not Available
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background: #3EA99F;"></div>
+    Other
+  </div>
+</div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoibWVnaGFuMzIxIiwiYSI6ImNtN3c0bm1mZDAxejIyaW9lMXNmNWhwMjgifQ.AtdNRYXkbiK19HqbEnBHYQ';
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/meghan321/cm9rfu7w100an01ssdk2965i8',
+    center: [-104.439, 36.903],
+    zoom: 4,
+    // minZoom: 3,
+    // maxZoom: 11
+  });
+
+  // Add zoom and rotation controls to the map
+  map.addControl(new mapboxgl.NavigationControl());
+
+  map.on('load', () => {
+    console.log('Map loaded successfully');
+
+    // Add Landslides Layer
+    map.addLayer({
+      'id': 'LS_point',
+      'type': 'circle',
+      'source': {
+        type: 'vector',
+        url: 'mapbox://meghan321.8sg0as5b'
+      },
+      'source-layer': 'Landslidestest-5nf79x',
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'circle-color': ['match', ['get', 'LS_Type_Category'],
+          'Other', '#3EA99F',
+          'Debris', '#54C571',
+          'Mass Failure', '#306754',
+          'Mudslide', '#98AFC7',
+          'Rockfall', '#FBD5AB',
+          'Weather Related', '#E9AB17',
+          'Data Not Available', '#E1D9D1',
+          '#FDEEF4'],
+        'circle-opacity': 0.9,
+        'circle-outline-color': '#a6303e',
+        'circle-radius': 6
+      }
+    });
+
+    // Slider Functionality
+    const slider = document.getElementById('slider');
+    const sliderTooltip = document.getElementById('slider-tooltip');
+
+    slider.addEventListener('input', (event) => {
+      const Year = parseInt(event.target.value);
+      sliderTooltip.textContent = Year;
+
+      // Apply the filter to the map layer
+      map.setFilter('LS_point', ['==', ['to-number', ['get', 'lsyear']], Year]);
+    });
+
+    // Add Popup for Landslides
+    map.on('click', 'LS_point', (e) => {
+      const properties = e.features[0].properties;
+      const popupContent = `
+        <div style="font-size: 14px; line-height: 1.5;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td><strong>Landslide Type:</strong></td><td>${properties.LS_Type_Category || 'N/A'}</td></tr>
+          </table>
+        </div>
+      `;
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(popupContent)
+        .addTo(map);
+    });
+  });
+</script>
+
+</body>
+</html>
